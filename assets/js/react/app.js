@@ -44,12 +44,35 @@ var Task = React.createClass({
   }
 });
 
+var App1 = React.createClass({
+
+  render: function() {
+    return (
+      <Route handler={App}>
+        <Route name="user" path="/user/:userId" handler={User}>
+          <Route name="task" path="/user/:userId/tasks/:taskId" handler={Task}/>
+        </Route>
+      </Route>
+      );
+  }
+});
+
 var routes = (
-  <Route handler={App} location="history">
+  <Route handler={App}>
     <Route name="user" path="/user/:userId" handler={User}>
       <Route name="task" path="/user/:userId/tasks/:taskId" handler={Task}/>
     </Route>
   </Route>
   );
 
-module.exports = routes;
+if (typeof window !== 'undefined') {
+  window.onload = function() {
+//    React.renderComponent(App1(), document.body);
+    React.renderComponent(routes, document.body);
+  }
+} else {
+//  module.exports = routes;
+//  module.exports = App1;
+}
+module.exports = App1;
+

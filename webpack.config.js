@@ -1,5 +1,5 @@
 module.exports = {
-  entry: "./assets/js/react/app-client.js",
+  entry: "./assets/js/react/app.js",
   output: {
     path: __dirname,
     filename: "./public/js/bundle.js"
