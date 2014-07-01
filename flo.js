@@ -24,8 +24,8 @@ var server = flo( 'assets/', {
       }
       if (filepath.indexOf('js') != -1) {
         callback({
-          resourceURL: 'index.js',
-          contents: fs.readFileSync('public/js/index.js'),
+          resourceURL: 'bundle.js',
+          contents: fs.readFileSync('public/js/bundle.js'),
           reload: false
         });
       }

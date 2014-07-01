@@ -22,19 +22,19 @@ gulp.task('stylus', function () {
     .pipe($.stylus(stylusConfig))
     .on('error', console.log)
     .pipe($.myth())
-    .pipe(gulp.dest('./public/css/'))
+    .pipe(gulp.dest('./public/css/'));
 //    .pipe ($.livereload(server));
 });
 
 
-gulp.task('jade', function () {
-  gulp.src([fSrc + fServerTemplates + '/*.jade',
-      '!' + fSrc + fServerTemplates + '/_*.jade'])
-    .pipe($.jade({ pretty: true }))
-    .on('error', console.log)
-    .pipe(gulp.dest('./public/'))
+//gulp.task('jade', function () {
+//  gulp.src([fSrc + fServerTemplates + '/*.jade',
+//      '!' + fSrc + fServerTemplates + '/_*.jade'])
+//    .pipe($.jade({ pretty: true }))
+//    .on('error', console.log)
+//    .pipe(gulp.dest('./public/'))
 //    .pipe($.livereload(server));
-});
+//});
 
 
 gulp.task('js', function () {
@@ -75,7 +75,7 @@ gulp.task('http-server', function () {
 gulp.task('default', function () {
   gulp.run('sprite');
   gulp.run('stylus');
-  gulp.run('jade');
+//  gulp.run('jade');
   gulp.run('images');
   gulp.run('js');
   gulp.run('fb-flo');
@@ -97,7 +97,8 @@ gulp.task('default', function () {
 //        gulp.run('stylus');
 //    });
     gulp.watch(fSrc + fServerTemplates + '/**/*.jade', function () {
-      gulp.run('jade');
+      console.log('wach!!!!!!!!!!!!!!');
+//      gulp.run('jade');
     });
 //    gulp.watch('assets/img/**/*', function() {
 //        gulp.run('images');
@@ -116,10 +117,10 @@ gulp.task('build', function () {
     .pipe($.csso())
     .pipe(gulp.dest('./build/css/'));
 
-  gulp.src([fSrc + fServerTemplates + '/*.jade',
-      '!' + fSrc + fServerTemplates + '/_*.jade'])
-    .pipe($.jade())
-    .pipe(gulp.dest('./build/'));
+//  gulp.src([fSrc + fServerTemplates + '/*.jade',
+//      '!' + fSrc + fServerTemplates + '/_*.jade'])
+//    .pipe($.jade())
+//    .pipe(gulp.dest('./build/'));
 
   gulp.src([fSrc + fJs + '/**/*.js',
       '!' + fSrc + fJs + '/vendor/**/*.js'])

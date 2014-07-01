@@ -4,17 +4,19 @@ Ready-to-go JS all-around stack to build web sites. **Not nearly ready for produ
 
 - [Gulp](http://gulpjs.com/) to maintain infrastructure
 - [NodeJS](http://nodejs.org/) and [Express](http://expressjs.com) to power server side
-- [ReactJS](http://facebook.github.io/react/) for both client and server rendering
-  - [react-nested-router](https://github.com/rpflorence/react-nested-router) for routing
 - [Stylus](http://learnboost.github.io/stylus/) for CSS
   - [Spritesmith](https://github.com/Ensighten/spritesmith) to craft sprites
 - [Fb-flo](https://github.com/facebook/fb-flo) to live reload JS/CSS in the browser
 - [Webpack](http://webpack.github.io/) to pack it all up for the browser
 
+- [ReactJS](http://facebook.github.io/react/) for both client and server rendering
+  - [react-nested-router](https://github.com/rpflorence/react-nested-router) for routing
+- Or [Jade](http://jade-lang.com/) for traditional web 1.0 architecture
+
 See all other goodies in [package.json](./package.json).
 
-Probably some of them (React) might be made optional/replacable in the future.
+Probably some of them (React/Jade) might be made optional/replacable in the future.
 
 `npm install` to get all dependencies.
 
-`gulp` to begin developing.
+`gulp` or `node_modules/.bin/gulp` to begin developing.
