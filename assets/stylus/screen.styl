@@ -1,0 +1,27 @@
+/*@import 'libs/normalize.styl'*/
+@import 'sprite.styl'
+@import 'bem/index.styl'
+@import 'blocks/header.styl'
+@import 'jeet'
+
+edit()
+
+.container
+  center(960px)
+
+.top-navigation
+  col(3/3)
+
+.main
+  col(2/3, gutter: 2)
+  /*shift(column: 2/3)*/
+  shift(1/3, gutter: 2)
+
+.aside
+  col(1/3, gutter: 2)
+  /*shift(column: -2)*/
+  shift(-2/3, gutter: 2)
+
+.col1, .col2, .col3
+  col(1/3 2/3, gutter: 2)
+
