@@ -2,11 +2,11 @@ var flo = require('fb-flo'),
     path = require('path'),
     fs = require('fs');
 
-var server = flo( 'assets/', {
+var server = flo('public/', {
   port: 8888,
   host: '127.0.0.1',
 //  verbose: true,
-  glob: [ '**/*.js', '**/*.styl' ]
+  glob: [ '**/*.js', '**/*.css' ]
 }, function resolver(filepath, callback) {
 
       console.log("----------------- fb-flo detected changes ");
@@ -14,7 +14,7 @@ var server = flo( 'assets/', {
       console.log(callback);
       console.log("-----------------");
 
-      if (filepath.indexOf('styl') != -1) {
+      if (filepath.indexOf('css') != -1) {
         callback({
 //        match: 'equal',
           resourceURL: 'screen.css',

@@ -1,4 +1,3 @@
-/*@import 'libs/normalize.styl'*/
 @import 'sprite.styl'
 @import 'bem/index.styl'
 @import 'blocks/header.styl'
@@ -11,6 +10,11 @@ edit()
 
 .top-navigation
   col(3/3)
+  ul
+    li
+      display inline
+      margin-left 20px
+      border 1px solid green
 
 .main
   col(2/3, gutter: 2)

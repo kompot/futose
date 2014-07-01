@@ -8,6 +8,8 @@ var $ = require('gulp-load-plugins')({
   pattern: 'gulp{-,.}*',
   replaceString: /gulp(\-|\.)/
 });
+var webpack   = require("webpack");
+var webpackConfig = require("./webpack.config.js");
 var connect = require('connect');
 var nib = require('nib');
 var jeet = require('jeet');
@@ -62,14 +64,31 @@ gulp.task('images', function () {
     .pipe(gulp.dest('./public/img'))
 });
 
+var spawn = require('child_process').spawn;
+var node;
 
 gulp.task('http-server', function () {
-  connect()
+//  connect()
 //    .use(require('connect-livereload')())
-    .use(connect.static('./public'))
-    .listen('9000');
+//    .use(connect.static('./public'))
+//    .listen('9000');
+  node = spawn('nodemon', ['server.js'], { stdio: 'inherit' });
+  console.log('Server listening on http://127.0.0.1:9001');
+});
 
-  console.log('Server listening on http://127.0.0.1:9000');
+var myDevConfig = Object.create(webpackConfig);
+myDevConfig.devtool = "sourcemap";
+//myDevConfig.devtool = "eval";
+myDevConfig.debug = true;
+var devCompiler = webpack(myDevConfig);
+gulp.task('webpack:build-dev', function(callback) {
+  devCompiler.run(function(err, stats) {
+    if(err) throw new gutil.PluginError('webpack:build-dev', err);
+    $.util.log('[webpack:build-dev]', stats.toString({
+      colors: true
+    }));
+    callback();
+  });
 });
 
 gulp.task('default', function () {
@@ -77,18 +96,13 @@ gulp.task('default', function () {
   gulp.run('stylus');
 //  gulp.run('jade');
   gulp.run('images');
-  gulp.run('js');
+//  gulp.run('js');
+  gulp.run('webpack:build-dev');
   gulp.run('fb-flo');
 
-  gulp.watch(fSrc + '/stylus/**/*.styl', function () {
-    gulp.run('stylus');
-  });
-  gulp.watch(fSrc + fJs + '/**/*', function () {
-    gulp.run('js');
-  });
-  gulp.watch(fSrc + '/sprite/*', function () {
-    gulp.run('sprite');
-  });
+  gulp.watch(fSrc + '/stylus/**/*.styl', ['stylus']);
+  gulp.watch(fSrc + fJs + '/**/*', ['webpack:build-dev']);
+  gulp.watch(fSrc + '/sprite/*', ['sprite']);
 
   server.listen(35729, function (err) {
     if (err) return console.log(err);
@@ -132,9 +146,6 @@ gulp.task('build', function () {
     .pipe($.imagemin())
     .pipe(gulp.dest('./build/img'))
 });
-
-var spawn = require('child_process').spawn;
-var node;
 
 gulp.task('fb-flo', function () {
   if (node) {
