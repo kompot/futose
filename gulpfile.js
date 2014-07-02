@@ -15,6 +15,13 @@ var nib = require('nib');
 var jeet = require('jeet');
 var stylusConfig = { use: [nib(), jeet()] };
 
+var defaultEnv = 'dev';
+if ($.util.env._[0] === 'build') {
+  defaultEnv = 'prod';
+}
+$.util.env.type = $.util.env.type || defaultEnv;
+$.util.log('Environment is `' + $.util.env.type + '`.');
+
 var srcPath    = './assets';
 var dstPath    = './build';
 var dstDevPath = './public';
@@ -113,8 +120,6 @@ gulp.task('webpack:build-dev', function(callback) {
 
 
 gulp.task('default', ['images', 'stylus'], function () {
-  $.util.env.type = 'dev';
-
   gulp.watch(paths.src.img, ['images']);
   gulp.watch(paths.src.cssWatch, ['stylus']);
   gulp.watch(fSrc + '/sprite/*.png', ['sprite']);
@@ -126,9 +131,7 @@ gulp.task('default', ['images', 'stylus'], function () {
   gulp.run('http-server');
 });
 
-gulp.task('build', ['stylus'], function () {
-  $.util.env.type = 'prod';
-
+gulp.task('build', ['images', 'stylus'], function () {
 
 
 //  gulp.src(fSrc + '/stylus/screen.styl')
