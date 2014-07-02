@@ -5,6 +5,7 @@ Ready-to-go JS all-around stack to build web sites. **Not nearly ready for produ
 - [Gulp](http://gulpjs.com/) to maintain infrastructure
 - [NodeJS](http://nodejs.org/) and [Express](http://expressjs.com) to power server side
 - [Stylus](http://learnboost.github.io/stylus/) for CSS
+  - [Jeet](https://jeet.gs) as a grid system 
   - [Spritesmith](https://github.com/Ensighten/spritesmith) to craft sprites
 - [Fb-flo](https://github.com/facebook/fb-flo) to live reload JS/CSS in the browser
 - [Webpack](http://webpack.github.io/) to pack it all up for the browser

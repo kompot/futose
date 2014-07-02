@@ -11,10 +11,14 @@ border-radius(n)
     border: 1px dashed blue
     border-radius n * .5
 
-h1 {
+h1
   margin-top 1em
   color lightFontColor
   font-size 2em
-  sprite($numberTwo)
   border-radius(1em)
-}
+  & div.number1
+    sprite($numberOne)
+    position absolute
+    margin-left -40px
+    margin-top -16px
+
