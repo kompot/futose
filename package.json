@@ -7,8 +7,6 @@
     "express": "^4.4.5"
   },
   "devDependencies": {
-    "connect": "^2.21.1",
-    "connect-livereload": "^0.4.0",
     "envify": "^1.2.1",
     "fb-flo": "^0.2.1",
     "gulp": "^3.8.5",

@@ -8,7 +8,6 @@ var Route = Router.Route;
 var Link = Router.Link;
 
 var App1 = React.createClass({
-
   render: function() {
     return routes;
   }
