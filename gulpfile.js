@@ -15,48 +15,46 @@ var nib = require('nib');
 var jeet = require('jeet');
 var stylusConfig = { use: [nib(), jeet()] };
 
-var defaultEnv = 'dev';
-if ($.util.env._[0] === 'build') {
-  defaultEnv = 'prod';
-}
+var defaultEnv = $.util.env._[0] === 'build' ? 'prod' : 'dev';
 $.util.env.type = $.util.env.type || defaultEnv;
 $.util.log('Environment is `' + $.util.env.type + '`.');
 
-var srcPath    = './assets';
-var dstPath    = './build';
-var dstDevPath = './public';
+var srcPath     = './assets';
+var dstProdPath = './build';
+var dstDevPath  = './public';
 
 var paths = {
   src: {
-    img:         srcPath + '/img/**/*',
+    img:         srcPath + '/img',
+    imgWatch:    srcPath + '/img/**/*',
+    spriteWatch: srcPath + '/sprite/**/*',
+    css:         srcPath + '/stylus',
     cssWatch:    srcPath + '/stylus/**/*',
     cssCompile: [srcPath + '/stylus/*.styl',
-           '!' + srcPath + '/stylus/_*.styl']
+           '!' + srcPath + '/stylus/_*.styl'],
+    jsWatch:     srcPath + '/js/**/*'
   },
-  dev: {
-    css: dstDevPath + '/css',
-    img: dstDevPath + '/img'
-  },
-  prod: {
-    css: dstPath + '/css',
-    img: dstPath + '/img'
+  dst: {
+    dev: {
+      css: dstDevPath + '/css',
+      img: dstDevPath + '/img'
+    },
+    prod: {
+      css: dstProdPath + '/css',
+      img: dstProdPath + '/img'
+    }
   }
 };
 
-var fSrc = './assets';
-var fServerTemplates = '/template';
-var fJs = '/js';
-var fSrcImg = fSrc + '/img/*.png';
-
 gulp.task('sprite', function () {
-  var spriteData = gulp.src(fSrc + '/sprite/*.png').pipe($.spritesmith({
+  var spriteData = gulp.src(paths.src.spriteWatch).pipe($.spritesmith({
     imgName: 'sprite.png',
     imgPath: '/img/sprite.png',
     cssName: '_sprite.styl',
     engine: 'pngsmith' // for maximum compatibility
   }));
-  spriteData.img.pipe(gulp.dest(fSrc + '/img'));
-  spriteData.css.pipe(gulp.dest(fSrc + '/stylus'));
+  spriteData.img.pipe(gulp.dest(paths.src.img));
+  spriteData.css.pipe(gulp.dest(paths.src.css));
 });
 
 gulp.task('stylus', ['sprite'], function () {
@@ -65,33 +63,13 @@ gulp.task('stylus', ['sprite'], function () {
     .on('error', console.log)
     .pipe($.myth())
     .pipe($.util.env.type === 'prod' ? $.csso() : $.util.noop())
-    .pipe(gulp.dest(paths[$.util.env.type].css));
-//    .pipe ($.livereload(server));
+    .pipe(gulp.dest(paths.dst[$.util.env.type].css));
 });
 
-
-//gulp.task('jade', function () {
-//  gulp.src([fSrc + fServerTemplates + '/*.jade',
-//      '!' + fSrc + fServerTemplates + '/_*.jade'])
-//    .pipe($.jade({ pretty: true }))
-//    .on('error', console.log)
-//    .pipe(gulp.dest('./public/'))
-//    .pipe($.livereload(server));
-//});
-
-
-//gulp.task('js', function () {
-//  gulp.src([fSrc + fJs + '/**/*.js',
-//      '!' + fSrc + fJs + '/vendor/**/*.js'])
-//    .pipe($.concat('index.js'))
-//    .pipe(gulp.dest('./public/js'))
-////    .pipe($.livereload(server));
-//});
-
 gulp.task('images', ['sprite'], function () {
-  gulp.src(paths.src.img)
+  gulp.src(paths.src.imgWatch)
     .pipe($.imagemin())
-    .pipe(gulp.dest(paths[$.util.env.type].img));
+    .pipe(gulp.dest(paths.dst[$.util.env.type].img));
 });
 
 var spawn = require('child_process').spawn;
@@ -111,50 +89,23 @@ var devCompiler = webpack(devConfig);
 gulp.task('webpack:build-dev', function(callback) {
   devCompiler.run(function(err, stats) {
     if(err) throw new gutil.PluginError('webpack:build-dev', err);
-    $.util.log('[webpack:build-dev]', stats.toString({
-      colors: true
-    }));
+    $.util.log('[webpack:build-dev]', stats.toString({ colors: true }));
     callback();
   });
 });
 
-
 gulp.task('default', ['images', 'stylus'], function () {
-  gulp.watch(paths.src.img, ['images']);
-  gulp.watch(paths.src.cssWatch, ['stylus']);
-  gulp.watch(fSrc + '/sprite/*.png', ['sprite']);
+  gulp.watch(paths.src.imgWatch,    ['images']);
+  gulp.watch(paths.src.cssWatch,    ['stylus']);
+  gulp.watch(paths.src.spriteWatch, ['sprite']);
 
-  gulp.watch(fSrc + fJs + '/**/*', ['webpack:build-dev']);
+  gulp.watch(paths.src.jsWatch,     ['webpack:build-dev']);
 
-  gulp.run('webpack:build-dev');
   gulp.run('fb-flo');
   gulp.run('http-server');
 });
 
-gulp.task('build', ['images', 'stylus'], function () {
-
-
-//  gulp.src(fSrc + '/stylus/screen.styl')
-//    .pipe($.stylus(stylusConfig))
-//    .pipe($.myth())
-//    .pipe($.csso())
-//    .pipe(gulp.dest('./build/css/'));
-
-//  gulp.src([fSrc + fServerTemplates + '/*.jade',
-//      '!' + fSrc + fServerTemplates + '/_*.jade'])
-//    .pipe($.jade())
-//    .pipe(gulp.dest('./build/'));
-
-//  gulp.src([fSrc + fJs + '/**/*.js',
-//      '!' + fSrc + fJs + '/vendor/**/*.js'])
-//    .pipe($.concat('index.js'))
-//    .pipe($.uglify())
-//    .pipe(gulp.dest('./build/js'));
-//
-//  gulp.src(paths.img)
-//    .pipe($.imagemin())
-//    .pipe(gulp.dest('./build/img'))
-});
+gulp.task('build', ['images', 'stylus']);
 
 gulp.task('fb-flo', function () {
   if (node) {
