@@ -1,10 +1,12 @@
 'use strict';
 
+var spawn = require('child_process').spawn;
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')({
   pattern: 'gulp{-,.}*',
   replaceString: /gulp(\-|\.)/
 });
+var revall = require('gulp-rev-all');
 var nib = require('nib');
 var jeet = require('jeet');
 var stylusConfig = { use: [nib(), jeet()] };
@@ -31,11 +33,13 @@ var paths = {
   },
   dst: {
     dev: {
+//      root: dstDevPath,
       css: dstDevPath + '/css',
       img: dstDevPath + '/img',
       js:  dstDevPath + '/js'
     },
     prod: {
+//      root: dstProdPath,
       css: dstProdPath + '/css',
       img: dstProdPath + '/img',
       js:  dstProdPath + '/js'
@@ -54,7 +58,7 @@ gulp.task('sprite', function () {
   spriteData.css.pipe(gulp.dest(paths.src.css));
 });
 
-gulp.task('stylus', ['sprite'], function () {
+gulp.task('stylus', function () {
   gulp.src(paths.src.cssCompile)
     .pipe($.stylus(stylusConfig))
     .on('error', $.util.log)
@@ -64,7 +68,7 @@ gulp.task('stylus', ['sprite'], function () {
     .pipe(gulp.dest(paths.dst[$.util.env.type].css));
 });
 
-gulp.task('images', ['sprite'], function () {
+gulp.task('images', function () {
   gulp.src(paths.src.imgWatch)
     .pipe($.imagemin())
     .pipe(gulp.dest(paths.dst[$.util.env.type].img));
@@ -98,33 +102,57 @@ gulp.task('clean', function () {
     .on('error', $.util.log);
 });
 
-gulp.task('default', ['clean', 'images', 'stylus', 'webpack'], function () {
+gulp.task('default', ['clean', 'images', 'stylus', 'webpack', 'fb-flo', 'http-server'], function () {
   gulp.watch(paths.src.imgWatch,    ['images']);
   gulp.watch(paths.src.cssWatch,    ['stylus']);
   gulp.watch(paths.src.spriteWatch, ['sprite']);
   gulp.watch(paths.src.jsWatch,     ['webpack']);
-  gulp.run('fb-flo');
-  gulp.run('http-server');
 });
 
-gulp.task('build', ['clean', 'images', 'stylus', 'webpack']);
-
-var spawn = require('child_process').spawn;
-var node;
+gulp.task('build', ['clean', 'images', 'stylus', 'webpack'], function () {
+//  gulp.src(['build/**', 'server.js'])
+//    .pipe(revall())
+//    .pipe(gulp.dest('cdn'))
+});
 
 gulp.task('http-server', function () {
-  node = spawn('nodemon', ['server.js'], { stdio: 'inherit' });
+  spawn('nodemon', ['-w', 'server.js', 'server.js'], { stdio: 'inherit' });
   console.log('Server listening on http://127.0.0.1:9001');
 });
 
 gulp.task('fb-flo', function () {
-  if (node) {
-    node.kill();
-  }
-  node = spawn('node', ['flo.js'], { stdio: 'inherit' });
-  node.on('close', function (code) {
-    if (code === 8) {
-      gulp.log('Error detected, turning off fb-flo...');
+  var flo = require('fb-flo');
+  var fs = require('fs');
+
+  var server = flo('public/', {
+      port: 8888,
+      host: '127.0.0.1',
+      glob: [ '**/*.js', '**/*.css' ]
+    }, function resolver(filepath, callback) {
+//      console.log("----------------- fb-flo detected changes ");
+//      console.log(filepath);
+//      console.log(callback);
+//      console.log("-----------------");
+
+      if (filepath.indexOf('css') != -1) {
+        callback({
+//        match: 'equal',
+          resourceURL: 'screen.css',
+          contents: fs.readFileSync('public/css/screen.css'),
+          reload: false
+        });
+      }
+      if (filepath.indexOf('js') != -1) {
+        callback({
+          resourceURL: 'app.js',
+          contents: fs.readFileSync('public/js/app.js'),
+          reload: false
+        });
+      }
     }
+  );
+
+  server.once('ready', function() {
+    $.util.log('Ready!');
   });
 });
