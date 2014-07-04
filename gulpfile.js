@@ -60,6 +60,7 @@ gulp.task('stylus', ['sprite'], function () {
     .on('error', $.util.log)
     .pipe($.myth())
     .pipe($.util.env.type === 'prod' ? $.csso() : $.util.noop())
+    .pipe($.filesize())
     .pipe(gulp.dest(paths.dst[$.util.env.type].css));
 });
 
@@ -80,10 +81,24 @@ gulp.task('webpack', function() {
     }))
     .pipe($.util.env.type === 'prod' ? $.uglify() : $.util.noop())
     .pipe($.rename("app.js"))
+    .pipe($.filesize())
     .pipe(gulp.dest(paths.dst[$.util.env.type].js));
 });
 
-gulp.task('default', ['images', 'stylus', 'webpack'], function () {
+gulp.task('clean', function () {
+  // TODO how to make this recursive, as
+  // paths.dst[$.util.env.type].root complains about
+  // directory is not empty
+  return gulp.src([
+      paths.dst[$.util.env.type].css,
+      paths.dst[$.util.env.type].img,
+      paths.dst[$.util.env.type].js
+    ], { read: false })
+    .pipe($.rimraf())
+    .on('error', $.util.log);
+});
+
+gulp.task('default', ['clean', 'images', 'stylus', 'webpack'], function () {
   gulp.watch(paths.src.imgWatch,    ['images']);
   gulp.watch(paths.src.cssWatch,    ['stylus']);
   gulp.watch(paths.src.spriteWatch, ['sprite']);
@@ -92,7 +107,7 @@ gulp.task('default', ['images', 'stylus', 'webpack'], function () {
   gulp.run('http-server');
 });
 
-gulp.task('build', ['images', 'stylus', 'webpack']);
+gulp.task('build', ['clean', 'images', 'stylus', 'webpack']);
 
 var spawn = require('child_process').spawn;
 var node;
