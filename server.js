@@ -17,7 +17,7 @@ app.get('/', function (req, res) {
   res.send('<!doctype html>\n' +
       '<head>' +
       '<title>react 2 test</title>' +
-      '<script src="/js/bundle.js" type="text/javascript"></script>' +
+      '<script src="/js/app.js" type="text/javascript"></script>' +
       '<link rel="stylesheet" href="/css/screen.css"></link>' +
       '</head>' +
       '<body>' + markup + '</body>' +

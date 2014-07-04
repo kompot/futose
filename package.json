@@ -18,9 +18,11 @@
     "gulp-livereload": "^2.1.0",
     "gulp-load-plugins": "^0.5.3",
     "gulp-myth": "^0.3.1",
+    "gulp-rename": "^1.2.0",
     "gulp-stylus": "^1.0.2",
     "gulp-uglify": "^0.3.0",
     "gulp-util": "^2.2.19",
+    "gulp-webpack": "^0.1.0",
     "gulp.spritesmith": "^1.1.1",
     "jeet": "^5.3.0",
     "jsx-loader": "^0.10.2",
@@ -28,8 +30,6 @@
     "node-jsx": "^0.10.0",
     "nodemon": "^1.2.1",
     "react": "^0.10.0",
-    "react-nested-router": "^0.2.0",
-    "tiny-lr": "^0.0.7",
-    "webpack": "^1.3.1-beta4"
+    "react-nested-router": "^0.2.0"
   }
 }
