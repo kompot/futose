@@ -5,8 +5,6 @@ var nodejsx   = require('node-jsx').install({extension: '.js'});
 var component = require('./assets/js/app.js');
 
 var app = express();
-app.set('views', __dirname + '/assets/template');
-app.set('view engine', 'jade');
 app.use(express.static(__dirname + '/public'));
 
 // TODO right now we always render root server component
