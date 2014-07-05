@@ -15,9 +15,9 @@ var defaultEnv = $.util.env._[0] === 'build' ? 'prod' : 'dev';
 $.util.env.type = $.util.env.type || defaultEnv;
 $.util.log('Environment is `' + $.util.env.type + '`.');
 
-var srcPath     = './assets';
-var dstProdPath = './build';
-var dstDevPath  = './public';
+var srcPath     = './src';
+var dstProdPath = './prod';
+var dstDevPath  = './dev';
 
 var paths = {
   src: {
@@ -75,7 +75,7 @@ gulp.task('images', function () {
 });
 
 gulp.task('webpack', function() {
-  return gulp.src('./assets/js/app.js')
+  return gulp.src('./src/js/app.js')
     .pipe($.webpack({
       module: {
         loaders: [
@@ -83,7 +83,7 @@ gulp.task('webpack', function() {
         ]
       }
     }))
-    .pipe($.util.env.type === 'prod' ? $.uglify() : $.util.noop())
+//    .pipe($.util.env.type === 'prod' ? $.uglify() : $.util.noop())
     .pipe($.rename("app.js"))
     .pipe($.filesize())
     .pipe(gulp.dest(paths.dst[$.util.env.type].js));
@@ -109,14 +109,19 @@ gulp.task('default', ['clean', 'images', 'stylus', 'webpack', 'fb-flo', 'http-se
   gulp.watch(paths.src.jsWatch,     ['webpack']);
 });
 
-gulp.task('build', ['clean', 'images', 'stylus', 'webpack'], function () {
-//  gulp.src(['build/**', 'server.js'])
-//    .pipe(revall())
-//    .pipe(gulp.dest('cdn'))
+gulp.task('copy-server-code', function () {
+  gulp.src(['src/js/server/**'])
+    .pipe(gulp.dest('prod/js/server'));
+});
+
+gulp.task('build', ['images', 'stylus', 'webpack', 'copy-server-code'], function () {
+  gulp.src(['prod/**'])
+    .pipe(revall())
+    .pipe(gulp.dest('prod-hashed'))
 });
 
 gulp.task('http-server', function () {
-  spawn('nodemon', ['-w', 'server.js', 'server.js'], { stdio: 'inherit' });
+  spawn('nodemon', ['-w', 'src/js/*', 'src/js/server/server.js'], { stdio: 'inherit' });
   console.log('Server listening on http://127.0.0.1:9001');
 });
 
@@ -124,7 +129,7 @@ gulp.task('fb-flo', function () {
   var flo = require('fb-flo');
   var fs = require('fs');
 
-  var server = flo('public/', {
+  var server = flo('dev/', {
       port: 8888,
       host: '127.0.0.1',
       glob: [ '**/*.js', '**/*.css' ]
@@ -138,14 +143,14 @@ gulp.task('fb-flo', function () {
         callback({
 //        match: 'equal',
           resourceURL: 'screen.css',
-          contents: fs.readFileSync('public/css/screen.css'),
+          contents: fs.readFileSync('dev/css/screen.css'),
           reload: false
         });
       }
       if (filepath.indexOf('js') != -1) {
         callback({
           resourceURL: 'app.js',
-          contents: fs.readFileSync('public/js/app.js'),
+          contents: fs.readFileSync('dev/js/app.js'),
           reload: false
         });
       }

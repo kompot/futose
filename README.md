@@ -20,3 +20,5 @@ Probably some of them (React) might be made optional/replacable in the future.
 `npm install` to get all dependencies.
 
 `gulp` or `node_modules/.bin/gulp` to begin developing.
+
+`gulp build` to build optimized assets ready to be thrown into production. 

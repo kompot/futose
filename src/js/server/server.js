@@ -2,10 +2,13 @@ var path      = require('path');
 var express   = require('express');
 var React     = require('react');
 var nodejsx   = require('node-jsx').install({extension: '.js'});
-var component = require('./assets/js/app.js');
+var component = require('./../app.js');
 
 var app = express();
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, '..', '..')));
+
+console.log('__dirname', __dirname);
+console.log('__dirname', path.join(__dirname, '..', '..'));
 
 // TODO right now we always render root server component
 // as soon as this issue
@@ -26,7 +29,7 @@ app.get('/', function (req, res) {
 });
 
 app
-  .use('/public', express.static(path.join(__dirname, 'public')))
+//  .use('../../dev', express.static(path.join(__dirname, '..', '..', 'dev')))
   .listen(9001, function() {
     console.log('Listening on port 9001');
   });
