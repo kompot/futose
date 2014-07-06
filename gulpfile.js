@@ -121,7 +121,7 @@ gulp.task('build', ['images', 'stylus', 'webpack', 'copy-server-code'], function
 });
 
 gulp.task('http-server', function () {
-  spawn('nodemon', ['-w', 'src/js/*', 'src/js/server/server.js'], { stdio: 'inherit' });
+  spawn('node_modules/.bin/nodemon', ['-w', 'src/js/*', 'src/js/server/server.js'], { stdio: 'inherit' });
   console.log('Server listening on http://127.0.0.1:9001');
 });
 
