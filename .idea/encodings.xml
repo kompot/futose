@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" useUTFGuessing="true" native2AsciiForPropertiesFiles="false">
+    <file url="file://$PROJECT_DIR$/.gitignore" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/.jshintrc" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/README.md" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gulpfile.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/package.json" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/js/app.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/js/layout.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/js/server/index.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/js/task.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/js/user.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/stylus/_sprite.styl" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/stylus/blocks/header.styl" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/stylus/screen.styl" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/template/_layout.jade" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/template/index.jade" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/template/task.jade" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/template/top-navigation.jade" charset="UTF-8" />
+  </component>
+</project>
+
