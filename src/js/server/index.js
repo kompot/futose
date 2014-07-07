@@ -1,7 +1,9 @@
+'use strict';
+
 var path      = require('path');
 var express   = require('express');
 var React     = require('react');
-var nodejsx   = require('node-jsx').install({extension: '.js'});
+require('node-jsx').install({extension: '.js'});
 var component = require('./../app.js');
 
 var app = express();
