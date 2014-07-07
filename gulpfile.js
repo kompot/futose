@@ -8,6 +8,7 @@ var $ = require('gulp-load-plugins')({
 });
 var runSequence = require('run-sequence');
 var revall = require('gulp-rev-all');
+var stylish = require('jshint-stylish');
 var nib = require('nib');
 var jeet = require('jeet');
 var stylusConfig = { use: [nib(), jeet()] };
@@ -82,6 +83,13 @@ gulp.task('images', function () {
   gulp.src(paths.src.imgWatch)
     .pipe($.imagemin())
     .pipe(gulp.dest(paths.dst[$.util.env.type].img));
+});
+
+gulp.task('lint:js', function() {
+  return gulp.src(paths.src.jsWatch)
+    .pipe($.react())
+    .pipe($.jshint())
+    .pipe($.jshint.reporter(stylish));
 });
 
 gulp.task('webpack', function() {
@@ -182,17 +190,16 @@ gulp.task('fb-flo', function () {
 
 gulp.task('build', function (callback) {
   runSequence('clean',
-    ['images', 'stylus', 'webpack', 'copy:server'],
+    ['images', 'stylus', 'lint:js', 'webpack', 'copy:server'],
     'hash:client', 'hash:server', callback);
 });
 
 gulp.task('default', function (callback) {
   runSequence('clean',
-    ['images', 'stylus', 'webpack', 'copy:server'],
+    ['images', 'stylus', 'lint:js', 'webpack', 'copy:server'],
     'fb-flo', 'http:dev', callback);
   gulp.watch(paths.src.imgWatch,    ['images']);
   gulp.watch(paths.src.cssWatch,    ['stylus']);
   gulp.watch(paths.src.spriteWatch, ['sprite']);
-  gulp.watch(paths.src.jsWatch,     ['copy:server']);
-  gulp.watch(paths.src.jsWatch,     ['webpack']);
+  gulp.watch(paths.src.jsWatch,     ['lint:js', 'webpack', 'copy:server']);
 });
