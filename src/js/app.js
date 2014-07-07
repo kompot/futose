@@ -1,9 +1,9 @@
 /** @jsx React.DOM */
 var React = require('react');
 var Router = require('react-nested-router');
-var Layout = require('./layout');
-var User = require('./user');
-var Task = require('./task');
+var Layout = require('./layout.js');
+var User = require('./user.js');
+var Task = require('./task.js');
 var Route = Router.Route;
 var Link = Router.Link;
 

@@ -5,10 +5,10 @@ var nodejsx   = require('node-jsx').install({extension: '.js'});
 var component = require('./../app.js');
 
 var app = express();
-app.use(express.static(path.join(__dirname, '..', '..')));
+app.use(express.static(path.join(__dirname, '..', '..', '..', 'client')));
 
 console.log('__dirname', __dirname);
-console.log('__dirname', path.join(__dirname, '..', '..'));
+console.log('__dirname', path.join(__dirname, '..', '..', '..', 'client'));
 
 // TODO right now we always render root server component
 // as soon as this issue
@@ -20,7 +20,7 @@ app.get('/', function (req, res) {
   res.send('<!doctype html>\n' +
       '<head>' +
       '<title>react 2 test</title>' +
-      '<script src="/js/app.js" type="text/javascript"></script>' +
+      '<script src="/js/bundle.js" type="text/javascript"></script>' +
       '<link rel="stylesheet" href="/css/screen.css"></link>' +
       '</head>' +
       '<body>' + markup + '</body>' +

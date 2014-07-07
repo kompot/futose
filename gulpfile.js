@@ -6,6 +6,7 @@ var $ = require('gulp-load-plugins')({
   pattern: 'gulp{-,.}*',
   replaceString: /gulp(\-|\.)/
 });
+var runSequence = require('run-sequence');
 var revall = require('gulp-rev-all');
 var nib = require('nib');
 var jeet = require('jeet');
@@ -18,6 +19,9 @@ $.util.log('Environment is `' + $.util.env.type + '`.');
 var srcPath     = './src';
 var dstProdPath = './prod';
 var dstDevPath  = './dev';
+var dstHashPath = '-hashed';
+var client      = '/client';
+var server      = '/server';
 
 var paths = {
   src: {
@@ -29,20 +33,24 @@ var paths = {
     cssCompile: [srcPath + '/stylus/*.styl',
            '!' + srcPath + '/stylus/_*.styl'],
     js:          srcPath + '/js',
-    jsWatch:     srcPath + '/js/**/*'
+    jsWatch:     srcPath + '/js/**/*',
+    jsServer:    srcPath + '/js/server/**/*'
   },
   dst: {
     dev: {
-//      root: dstDevPath,
-      css: dstDevPath + '/css',
-      img: dstDevPath + '/img',
-      js:  dstDevPath + '/js'
+      root: dstDevPath,
+      css: dstDevPath + client + '/css',
+      img: dstDevPath + client + '/img',
+      js:  dstDevPath + client + '/js',
+      jsServer: dstDevPath + server + '/js'
     },
     prod: {
-//      root: dstProdPath,
-      css: dstProdPath + '/css',
-      img: dstProdPath + '/img',
-      js:  dstProdPath + '/js'
+      root: dstProdPath,
+      rootHashed: dstProdPath + dstHashPath,
+      css: dstProdPath + client + '/css',
+      img: dstProdPath + client + '/img',
+      js:  dstProdPath + client + '/js',
+      jsServer: dstProdPath + server + '/js'
     }
   }
 };
@@ -83,26 +91,26 @@ gulp.task('webpack', function() {
         ]
       }
     }))
-//    .pipe($.util.env.type === 'prod' ? $.uglify() : $.util.noop())
-    .pipe($.rename("app.js"))
+    .pipe($.util.env.type === 'prod' ? $.uglify() : $.util.noop())
+    .pipe($.rename("bundle.js"))
     .pipe($.filesize())
     .pipe(gulp.dest(paths.dst[$.util.env.type].js));
 });
 
 gulp.task('clean', function () {
-  // TODO how to make this recursive, as
-  // paths.dst[$.util.env.type].root complains about
-  // directory is not empty
-  return gulp.src([
-      paths.dst[$.util.env.type].css,
-      paths.dst[$.util.env.type].img,
-      paths.dst[$.util.env.type].js
-    ], { read: false })
+  var pathsToClean = [paths.dst[$.util.env.type].root];
+  if ($.util.env.type === 'prod') {
+    pathsToClean.push(paths.dst[$.util.env.type].rootHashed);
+  }
+  return gulp.src(pathsToClean, { read: false })
     .pipe($.rimraf())
     .on('error', $.util.log);
 });
 
-gulp.task('default', ['clean', 'images', 'stylus', 'webpack', 'fb-flo', 'http-server'], function () {
+gulp.task('default', function (callback) {
+  runSequence('clean',
+    ['images', 'stylus', 'webpack', 'copy-server-code'],
+    'fb-flo', 'http-server', callback);
   gulp.watch(paths.src.imgWatch,    ['images']);
   gulp.watch(paths.src.cssWatch,    ['stylus']);
   gulp.watch(paths.src.spriteWatch, ['sprite']);
@@ -110,18 +118,42 @@ gulp.task('default', ['clean', 'images', 'stylus', 'webpack', 'fb-flo', 'http-se
 });
 
 gulp.task('copy-server-code', function () {
-  gulp.src(['src/js/server/**'])
-    .pipe(gulp.dest('prod/js/server'));
+  gulp.src([paths.src.jsWatch])
+    .pipe(gulp.dest(paths.dst[$.util.env.type].jsServer));
 });
 
-gulp.task('build', ['images', 'stylus', 'webpack', 'copy-server-code'], function () {
-  gulp.src(['prod/**'])
-    .pipe(revall())
-    .pipe(gulp.dest('prod-hashed'))
+var everythingHashed = [
+    dstProdPath + client + '/**/*',
+    dstProdPath + server + '/**/*'
+];
+var options = {
+  transformPath: function (rev, source, path) {
+    return source.indexOf('./') === 0 ? './' + rev : rev;
+  }
+};
+
+gulp.task('hash:client', function () {
+  return gulp.src(everythingHashed)
+    .pipe(revall(options))
+    .pipe($.filter(['**/*', '!**/*.js', '**/bundle*js']))
+    .pipe(gulp.dest(dstProdPath + dstHashPath + client));
 });
 
-gulp.task('http-server', function () {
-  spawn('node_modules/.bin/nodemon', ['-w', 'src/js/*', 'src/js/server/server.js'], { stdio: 'inherit' });
+gulp.task('hash:server', function () {
+  return gulp.src(everythingHashed)
+    .pipe(revall(options))
+    .pipe($.filter(['**/*.js', '!**/bundle*js']))
+    .pipe(gulp.dest(dstProdPath + dstHashPath + server));
+});
+
+gulp.task('build', function (callback) {
+  runSequence('clean',
+    ['images', 'stylus', 'webpack', 'copy-server-code'],
+    'hash:client', 'hash:server', callback);
+});
+
+gulp.task('http-server', ['copy-server-code'], function () {
+  spawn('node_modules/.bin/nodemon', ['-w', 'src/js/*', 'dev/server/js/server/server.js'], { stdio: 'inherit' });
   console.log('Server listening on http://127.0.0.1:9001');
 });
 
@@ -129,7 +161,7 @@ gulp.task('fb-flo', function () {
   var flo = require('fb-flo');
   var fs = require('fs');
 
-  var server = flo('dev/', {
+  var server = flo(dstDevPath + client, {
       port: 8888,
       host: '127.0.0.1',
       glob: [ '**/*.js', '**/*.css' ]
@@ -143,14 +175,14 @@ gulp.task('fb-flo', function () {
         callback({
 //        match: 'equal',
           resourceURL: 'screen.css',
-          contents: fs.readFileSync('dev/css/screen.css'),
+          contents: fs.readFileSync(paths.dst.dev.css + '/screen.css'),
           reload: false
         });
       }
       if (filepath.indexOf('js') != -1) {
         callback({
-          resourceURL: 'app.js',
-          contents: fs.readFileSync('dev/js/app.js'),
+          resourceURL: 'bundle.js',
+          contents: fs.readFileSync(paths.dst.dev.js + '/bundle.js'),
           reload: false
         });
       }
