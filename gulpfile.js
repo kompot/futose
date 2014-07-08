@@ -16,6 +16,10 @@ var stylusConfig = { use: [nib(), jeet()] };
 var defaultEnv = $.util.env._[0] === 'build' ? 'prod' : 'dev';
 $.util.env.type = $.util.env.type || defaultEnv;
 $.util.log('Environment is `' + $.util.env.type + '`.');
+if (defaultEnv === 'prod') {
+  // this makes webpack's envify-loader kick in
+  process.env.NODE_ENV = 'production';
+}
 
 var serverEntry   = '/server/js/server/index.js';
 var webpackPrefix = 'bundle';
@@ -97,7 +101,8 @@ gulp.task('webpack', function() {
     .pipe($.webpack({
       module: {
         loaders: [
-          { test: /\.js$/, loader: 'jsx-loader' }
+          { test: /\.js$/, loader: 'jsx-loader' },
+          { test: /\.js$/, loader: "envify-loader" }
         ]
       }
     }))

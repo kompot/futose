@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "envify": "^1.2.1",
+    "envify-loader": "^0.1.0",
     "fb-flo": "^0.2.1",
     "gulp": "^3.8.5",
     "gulp-csso": "^0.2.9",
