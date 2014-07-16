@@ -4,10 +4,10 @@ var spawn = require('child_process').spawn;
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')({
   pattern: 'gulp{-,.}*',
-  replaceString: /gulp(\-|\.)/
+  replaceString: /gulp(\-|\.)/,
+  camelize: true
 });
 var runSequence = require('run-sequence');
-var revall = require('gulp-rev-all');
 var stylish = require('jshint-stylish');
 var nib = require('nib');
 var jeet = require('jeet');
@@ -74,7 +74,7 @@ gulp.task('sprite', function () {
 });
 
 gulp.task('stylus', function () {
-  gulp.src(paths.src.cssCompile)
+  return gulp.src(paths.src.cssCompile)
     .pipe($.stylus(stylusConfig))
     .on('error', $.util.log)
     .pipe($.myth())
@@ -84,7 +84,7 @@ gulp.task('stylus', function () {
 });
 
 gulp.task('images', function () {
-  gulp.src(paths.src.imgWatch)
+  return gulp.src(paths.src.imgWatch)
     .pipe($.imagemin())
     .pipe(gulp.dest(paths.dst[$.util.env.type].img));
 });
@@ -123,7 +123,7 @@ gulp.task('clean', function () {
 });
 
 gulp.task('copy:server', function () {
-  gulp.src([paths.src.jsWatch])
+  return gulp.src([paths.src.jsWatch])
     .pipe(gulp.dest(paths.dst[$.util.env.type].jsServer));
 });
 
@@ -131,6 +131,8 @@ var everythingHashed = [
     paths.dst.prod.root + client + '/**/*',
     paths.dst.prod.root + server + '/**/*'
 ];
+
+// TODO remove this, it is fixed in latest gulp-rev-all
 var options = {
   transformPath: function (rev, source, path) {
     return source.indexOf('./') === 0 ? './' + rev : rev;
@@ -139,14 +141,14 @@ var options = {
 
 gulp.task('hash:client', function () {
   return gulp.src(everythingHashed)
-    .pipe(revall(options))
+    .pipe($.revAll(options))
     .pipe($.filter(['**/*', '!**/*.js', '**/' + webpackPrefix + '*js']))
     .pipe(gulp.dest(paths.dst[$.util.env.type].rootHashed + client));
 });
 
 gulp.task('hash:server', function () {
   return gulp.src(everythingHashed)
-    .pipe(revall(options))
+    .pipe($.revAll(options))
     .pipe($.filter(['**/*.js', '!**/' + webpackPrefix + '*js']))
     .pipe(gulp.dest(paths.dst[$.util.env.type].rootHashed + server));
 });
@@ -165,11 +167,6 @@ gulp.task('fb-flo', function () {
       host: '127.0.0.1',
       glob: [ '**/*.js', '**/*.css' ]
     }, function resolver(filepath, callback) {
-//      console.log("----------------- fb-flo detected changes ");
-//      console.log(filepath);
-//      console.log(callback);
-//      console.log("-----------------");
-
       if (filepath.indexOf('css') != -1) {
         callback({
 //        match: 'equal',
