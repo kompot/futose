@@ -127,30 +127,19 @@ gulp.task('copy:server', function () {
     .pipe(gulp.dest(paths.dst[$.util.env.type].jsServer));
 });
 
-var everythingHashed = [
-    paths.dst.prod.root + client + '/**/*',
-    paths.dst.prod.root + server + '/**/*'
-];
-
-// TODO remove this, it is fixed in latest gulp-rev-all
-var options = {
-  transformPath: function (rev, source, path) {
-    return source.indexOf('./') === 0 ? './' + rev : rev;
-  }
-};
-
-gulp.task('hash:client', function () {
-  return gulp.src(everythingHashed)
-    .pipe($.revAll(options))
-    .pipe($.filter(['**/*', '!**/*.js', '**/' + webpackPrefix + '*js']))
+gulp.task('hash', function () {
+  var filterServer = $.filter(['**/*.js', '!**/' + webpackPrefix + '*js']);
+  var filterClient = $.filter(['**/*', '!**/*.js', '**/' + webpackPrefix + '*js']);
+  return gulp.src([
+      paths.dst.prod.root + client + '/**/*',
+      paths.dst.prod.root + server + '/**/*'
+    ])
+    .pipe($.revAll())
+    .pipe(filterServer)
+    .pipe(gulp.dest(paths.dst.prod.rootHashed + server))
+    .pipe(filterServer.restore())
+    .pipe(filterClient)
     .pipe(gulp.dest(paths.dst[$.util.env.type].rootHashed + client));
-});
-
-gulp.task('hash:server', function () {
-  return gulp.src(everythingHashed)
-    .pipe($.revAll(options))
-    .pipe($.filter(['**/*.js', '!**/' + webpackPrefix + '*js']))
-    .pipe(gulp.dest(paths.dst[$.util.env.type].rootHashed + server));
 });
 
 gulp.task('http:dev', ['copy:server'], function () {
@@ -193,7 +182,7 @@ gulp.task('fb-flo', function () {
 gulp.task('build', function (callback) {
   runSequence('clean',
     ['images', 'stylus', 'lint:js', 'webpack', 'copy:server'],
-    'hash:client', 'hash:server', callback);
+    'hash', callback);
 });
 
 gulp.task('default', function (callback) {
