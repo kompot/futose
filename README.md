@@ -1,4 +1,4 @@
-# Futose
+# Futose [![Dependencies status](https://david-dm.org/kompot/futose.svg)](https://david-dm.org/kompot/futose) [![Developer dependency status](https://david-dm.org/kompot/futose/dev-status.svg)](https://david-dm.org/kompot/futose#info=devDependencies)
 
 Ready-to-go JS all-around stack to build web sites. These hipster technologies and libraries are being used right now.
 
